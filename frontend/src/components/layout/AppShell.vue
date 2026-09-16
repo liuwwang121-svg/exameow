@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18nStore } from '@/stores/i18n'
+import { useWrongBookStore } from '@/stores/wrongBook'
 import { useTheme } from '@/composables/useTheme'
 import { isTauri, isMacOS, isWindows, isLinux } from '@/utils/platform'
 import TitleBar from './TitleBar.vue'
@@ -17,11 +18,13 @@ import {
   MagnifyingGlassIcon,
   UserCircleIcon,
   LanguageIcon,
+  BookOpenIcon,
 } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const route = useRoute()
 const i18n = useI18nStore()
+const wrongBookStore = useWrongBookStore()
 const showLanguageDialog = ref(false)
 
 const { theme, cycleTheme } = useTheme()
@@ -38,11 +41,16 @@ async function openGitHub() {
 }
 
 const navItems = [
-  { key: 'navPractice', path: '/practice', icon: AcademicCapIcon },
-  { key: 'navGenerate', path: '/generate', icon: SparklesIcon },
-  { key: 'navSearch', path: '/search', icon: MagnifyingGlassIcon },
-  { key: 'navMine', path: '/mine', icon: UserCircleIcon },
+  { key: 'navPractice', label: '', path: '/practice', icon: AcademicCapIcon },
+  { key: '', label: '错题本', path: '/wrong-book', icon: BookOpenIcon },
+  { key: 'navGenerate', label: '', path: '/generate', icon: SparklesIcon },
+  { key: 'navSearch', label: '', path: '/search', icon: MagnifyingGlassIcon },
+  { key: 'navMine', label: '', path: '/mine', icon: UserCircleIcon },
 ]
+
+function navLabel(item: typeof navItems[number]): string {
+  return item.label || i18n.t(item.key as any)
+}
 
 function isNavActive(item: { path: string }): boolean {
   return route.path === item.path || route.path.startsWith(item.path + '/')
@@ -137,7 +145,8 @@ const headerStyle = {
               @click="router.push(item.path)"
             >
               <component :is="item.icon" class="w-4 h-4 transition-transform duration-200" :class="{ 'scale-110': isNavActive(item) }" />
-              <span>{{ i18n.t(item.key as any) }}</span>
+              <span>{{ navLabel(item) }}</span>
+              <span v-if="item.path === '/wrong-book' && wrongBookStore.dueCount" class="min-w-5 h-5 px-1 rounded-full text-[10px] flex items-center justify-center" style="background: rgb(var(--md-error)); color: rgb(var(--md-on-error))">{{ wrongBookStore.dueCount > 99 ? '99+' : wrongBookStore.dueCount }}</span>
             </button>
           </nav>
         </div>
@@ -224,7 +233,8 @@ const headerStyle = {
               class="w-5 h-5 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
               :style="{ transform: isNavActive(item) ? 'scale(1.15) translateY(-1px)' : 'scale(1)' }"
             />
-            <span class="text-[11px] font-semibold leading-tight tracking-tight">{{ i18n.t(item.key as any) }}</span>
+            <span class="text-[10px] font-semibold leading-tight tracking-tight">{{ navLabel(item) }}</span>
+            <span v-if="item.path === '/wrong-book' && wrongBookStore.dueCount" class="absolute top-0 right-[22%] min-w-4 h-4 px-1 rounded-full text-[9px] flex items-center justify-center" style="background: rgb(var(--md-error)); color: rgb(var(--md-on-error))">{{ wrongBookStore.dueCount > 99 ? '99+' : wrongBookStore.dueCount }}</span>
           </button>
         </div>
       </div>

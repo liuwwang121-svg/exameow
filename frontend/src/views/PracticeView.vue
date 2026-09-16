@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useI18nStore } from '@/stores/i18n'
 import { usePracticeStore } from '@/stores/practice'
 import { useWrongQuestionsStore } from '@/stores/wrongQuestions'
+import { useWrongBookStore } from '@/stores/wrongBook'
 import { useConfigStore } from '@/stores/config'
 import { api } from '@/api'
 import { isCloudflare } from '@/utils/platform'
@@ -38,6 +39,7 @@ import {
 const i18n = useI18nStore()
 const practiceStore = usePracticeStore()
 const wrongStore = useWrongQuestionsStore()
+const wrongBookStore = useWrongBookStore()
 const configStore = useConfigStore()
 
 type ViewState = 'browse' | 'settings' | 'practice' | 'result'
@@ -402,6 +404,20 @@ function handleSelect(answer: string | null) {
   practiceStore.setAnswer(answer)
 }
 
+function recordInUnifiedWrongBook() {
+  const current = practiceStore.currentQuestion
+  const bankId = sessionBankId.value
+  if (!current || !bankId) return
+  const originalId = current.question.id.replace(/-s\d+$/, '')
+  const bankName = practiceStore.getBank(bankId)?.name ?? '行测题库'
+  void wrongBookStore.recordPracticeWrong({
+    bankId,
+    bankName,
+    question: { ...current.question, id: originalId },
+    userAnswer: current.userAnswer ?? '',
+  }).catch(() => showToast('错题本保存失败，请稍后重试'))
+}
+
 function handleSubmit(answer: string | null) {
   const isCorrect = practiceStore.submitAnswer(answer)
 
@@ -414,6 +430,7 @@ function handleSubmit(answer: string | null) {
       }
     } else if (isCorrect === false) {
       wrongStore.recordWrong(sessionBankId.value, originalId)
+      recordInUnifiedWrongBook()
     }
   }
 
@@ -442,6 +459,7 @@ function applyGrade(correct: boolean) {
       }
     } else {
       wrongStore.recordWrong(sessionBankId.value, originalId)
+      recordInUnifiedWrongBook()
     }
   }
 }

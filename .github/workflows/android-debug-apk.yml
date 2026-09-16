@@ -1,0 +1,67 @@
+name: Build Android Debug APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/android-wrong-book-v1]
+
+permissions:
+  contents: read
+
+env:
+  PNPM_VERSION: '11.19.0'
+  NODE_VERSION: '22'
+  JAVA_VERSION: '17'
+  ANDROID_NDK_VERSION: '27.0.12077973'
+
+jobs:
+  build-android-debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Test and type-check
+        run: |
+          pnpm --dir frontend test
+          pnpm --dir frontend run type-check
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'ndk;${{ env.ANDROID_NDK_VERSION }}'
+      - name: Initialize Android project
+        run: |
+          pnpm tauri android init
+          pnpm tauri icon src-tauri/icons/icon.png
+          sed -i 's|<uses-permission android:name="android.permission.INTERNET" />|<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.CAMERA" />|' src-tauri/gen/android/app/src/main/AndroidManifest.xml
+      - name: Build installable debug APK
+        run: pnpm tauri android build --debug --apk --target aarch64
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/${{ env.ANDROID_NDK_VERSION }}
+      - name: Collect APK
+        run: |
+          mkdir -p dist
+          APK=$(find src-tauri/gen/android/app/build/outputs/apk -type f -name '*.apk' | head -n 1)
+          test -n "$APK"
+          cp "$APK" dist/Exameow-xingce-wrong-book-v1-debug-arm64.apk
+          test -s dist/Exameow-xingce-wrong-book-v1-debug-arm64.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exameow-android-debug-apk
+          path: dist/Exameow-xingce-wrong-book-v1-debug-arm64.apk
+          if-no-files-found: error
+          retention-days: 14

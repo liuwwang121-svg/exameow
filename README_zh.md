@@ -2,6 +2,8 @@
   <img src="./assets/readme/hero-zh.svg" width="100%" alt="过了喵 Exameow — AI 驱动的考试题目生成器:上传学习资料,秒级生成专业考题">
 </p>
 
+> 此 Fork 的 `feat/android-wrong-book-v1` 分支增加了安卓优先的行测错题本：做错自动入库、拍照录入、按固定标题批量导入 DOCX、原图本地保存、四档间隔复习、单题 AI 解析和完整备份恢复。GitHub Actions 的 **Build Android Debug APK** 工作流可生成无需私人签名密钥的测试 APK。
+
 <p align="center">
   <a href="https://github.com/heshengtao/exameow/releases"><img src="https://img.shields.io/github/v/release/heshengtao/exameow?style=flat-square&color=1A6CFF" alt="GitHub release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-1A6CFF?style=flat-square" alt="License: Apache-2.0"></a>

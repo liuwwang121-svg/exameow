@@ -20,6 +20,12 @@ const router = createRouter({
       meta: { title: 'Generate Exam' },
     },
     {
+      path: '/wrong-book',
+      name: 'wrong-book',
+      component: () => import('@/views/WrongBookView.vue'),
+      meta: { title: '行测错题本' },
+    },
+    {
       path: '/search',
       name: 'search',
       component: () => import('@/views/SearchHomeView.vue'),
