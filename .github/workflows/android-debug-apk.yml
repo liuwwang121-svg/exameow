@@ -39,6 +39,11 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
+      - name: Install stable V1 test signing key
+        run: |
+          mkdir -p "$HOME/.android"
+          base64 -d .github/android-debug.keystore.b64 > "$HOME/.android/debug.keystore"
+          keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey
       - uses: android-actions/setup-android@v3
         with:
           packages: 'ndk;${{ env.ANDROID_NDK_VERSION }}'
