@@ -23,13 +23,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".focus.FocusForegroundService" android:exported="false" android:foregroundServiceType="specialUse">
+        <service android:name=".nativev2.FocusForegroundService" android:exported="false" android:foregroundServiceType="specialUse">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="User-initiated exam study focus timer" />
         </service>
-        <service android:name=".blocking.FocusAccessibilityService" android:exported="false" android:label="@string/app_name" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+        <service android:name=".nativev2.FocusAccessibilityService" android:exported="false" android:label="@string/app_name" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter><action android:name="android.accessibilityservice.AccessibilityService" /></intent-filter>
             <meta-data android:name="android.accessibilityservice" android:resource="@xml/accessibility_service_config" />
         </service>
-        <receiver android:name=".reminder.ReminderReceiver" android:exported="false" />
+        <receiver android:name=".nativev2.ReminderReceiver" android:exported="false" />
     </application>
 </manifest>
