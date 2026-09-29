@@ -4,7 +4,7 @@ on:
   push:
     branches: [gongkao-focus-android-v2]
     paths:
-      - 'gongkao-focus/android-project.tar.gz.b64'
+      - 'gongkao-focus/android/**'
       - '.github/workflows/gongkao-focus-android.yml'
   workflow_dispatch:
 
@@ -29,17 +29,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
-      - name: Decode Android project
-        run: |
-          mkdir -p gongkao-focus/buildsrc
-          base64 -d gongkao-focus/android-project.tar.gz.b64 > /tmp/android-project.tar.gz
-          tar -xzf /tmp/android-project.tar.gz -C gongkao-focus/buildsrc
       - name: Unit test and build debug APK
-        run: gradle -p gongkao-focus/buildsrc/android testDebugUnitTest assembleDebug --stacktrace
+        run: gradle -p gongkao-focus/android testDebugUnitTest assembleDebug --stacktrace
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: shangan-focus-debug-apk
-          path: gongkao-focus/buildsrc/android/app/build/outputs/apk/debug/app-debug.apk
+          path: gongkao-focus/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
