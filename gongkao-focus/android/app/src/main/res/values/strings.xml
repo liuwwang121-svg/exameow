@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">上岸专注</string>
+    <string name="accessibility_service_description">在你主动开启强制专注时，阻止已选择的干扰应用并记录中断。</string>
+</resources>
