@@ -27,6 +27,7 @@ android {
 dependencies {
     implementation(libs.androidx.core)
     implementation(libs.androidx.webkit)
+    implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
     testImplementation(libs.junit)
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:core-ktx:1.6.1")
